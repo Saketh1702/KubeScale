@@ -1,0 +1,16 @@
+# KubeScale Configuration
+cloud:
+  provider: aws
+  region: us-west-2
+  accessKey: ${AWS_ACCESS_KEY}
+  secretKey: ${AWS_SECRET_KEY}
+
+scaling:
+  minNodes: 2
+  maxNodes: 10
+  scaleUpThreshold: 0.75
+  scaleDownThreshold: 0.3
+
+monitoring:
+  namespace: default
+  interval: 30s
