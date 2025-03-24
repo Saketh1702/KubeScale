@@ -7,6 +7,7 @@ import (
 
     "github.com/gin-gonic/gin"
     "github.com/Saketh1702/KubeScale/pkg/monitor"
+	"github.com/Saketh1702/KubeScale/pkg/cloud"
     "github.com/Saketh1702/KubeScale/pkg/cloud/aws"
 )
 
@@ -38,9 +39,43 @@ func main() {
     })
     
     r.POST("/scale", func(c *gin.Context) {
-        // TODO: Implement scaling endpoint
-        c.JSON(http.StatusOK, gin.H{"message": "Scaling request received"})
-    })
+		// Get metrics data
+		metrics, err := collector.CollectMetrics(c)
+		if err != nil {
+			c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+			return
+		}
+		
+		// Use the predictor to predict workload
+		prediction, err := predictor.PredictWorkload(metrics)
+		if err != nil {
+			c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+			return
+		}
+		
+		// Determine scaling action based on prediction
+		var action cloud.ScalingAction
+		if prediction.ExpectedCPU > 0.75 {
+			action = cloud.ScalingAction{
+				InstanceType: "t3.medium",
+				TargetCount: 5,
+				Region: "us-west-2",
+			}
+			
+			// Use cloud provider to scale
+			err = cloudProvider.ScaleCluster(c, action)
+			if err != nil {
+				c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+				return
+			}
+		}
+		
+		c.JSON(http.StatusOK, gin.H{
+			"message": "Scaling request processed",
+			"prediction": prediction,
+			"action": action,
+		})
+	})
     
     // Start server
     log.Println("Starting KubeScale API server on :8080")
