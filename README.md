@@ -6,7 +6,11 @@ KubeScale is an intelligent, adaptive scaling service designed to optimize resou
 
 ## 🏗️ Architecture
 
-![KubeScale Architecture](https://your-architecture-diagram-url-here.png)
+
+https://github.com/user-attachments/assets/3f009ca6-d751-4166-bb7b-2e7a87c85a09
+
+
+
 
 KubeScale consists of the following core components:
 
